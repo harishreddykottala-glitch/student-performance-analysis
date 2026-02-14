@@ -14,14 +14,14 @@ The system is built on a robust and scalable architecture, leveraging the power 
 
 ```mermaid
 graph TD
-    A[User Interface (HTML/JS)] -->|Uploads CSV| B(Flask Backend)
-    B -->|Parses Data| C{Data Processing Service}
-    C -->|Calculates Stats| D[Analytics Engine (Pandas)]
-    C -->|Generates Insights| E[AI Mentor (Google Gemini Pro)]
+    A["User Interface (HTML/JS)"] -->|Uploads CSV| B("Flask Backend")
+    B -->|Parses Data| C{"Data Processing Service"}
+    C -->|Calculates Stats| D["Analytics Engine (Pandas)"]
+    C -->|Generates Insights| E["AI Mentor (Google Gemini Pro)"]
     D --> B
     E --> B
     B -->|Returns JSON| A
-    A -->|Renders Charts| F[Chart.js Visualization]
+    A -->|Renders Charts| F["Chart.js Visualization"]
 ```
 
 ### Key Components:
