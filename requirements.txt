@@ -1,0 +1,18 @@
+# Backend & API
+fastapi>=0.109,<0.115
+uvicorn[standard]>=0.27
+python-multipart>=0.0.6
+
+# Data & analytics (numpy 2.x has Python 3.13 wheels; 1.x builds from source)
+pandas>=2.0
+numpy>=2.0
+scipy>=1.10
+
+# AI (Gemini)
+google-generativeai>=0.4
+
+# Environment
+python-dotenv>=1.0
+
+# Optional: async HTTP
+httpx>=0.26

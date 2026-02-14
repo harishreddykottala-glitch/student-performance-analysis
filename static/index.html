@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Performance Analysis</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fdfbf7;
+      /* Warm off-white */
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --muted: #64748b;
+      --primary: #6366f1;
+      --primary-dark: #4338ca;
+      --secondary: #ec4899;
+      --accent: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+      --card-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --gradient-primary: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      --gradient-sunny: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
+      --gradient-mint: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%);
+      --gradient-lavender: linear-gradient(135deg, #e0e7ff 0%, #f5f3ff 100%);
+      --gradient-rose: linear-gradient(135deg, #ffe4e6 0%, #fff1f2 100%);
+      /* Vibrant Mesh */
+      --mesh-bg: radial-gradient(at 0% 0%, hsla(253, 16%, 96%, 1) 0, transparent 50%),
+        radial-gradient(at 50% 0%, hsla(225, 100%, 94%, 1) 0, transparent 50%),
+        radial-gradient(at 100% 0%, hsla(339, 100%, 96%, 1) 0, transparent 50%);
+    }
+
+    /* Keyframes */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse-soft {
+      0% {
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: #f8fafc;
+      background-image:
+        radial-gradient(circle at 15% 50%, rgba(253, 224, 71, 0.15), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(99, 102, 241, 0.15), transparent 25%);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      position: relative;
+    }
+
+    /* ... Header styles (keep mostly same, maybe slight transparency tweak) ... */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+      padding: 1rem 0;
+      margin-bottom: 2rem;
+      transition: all 0.3s ease;
+    }
+
+    header .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(to right, #4f46e5, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.25rem;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .upload-wrap {
+      display: flex;
+      align-items: center;
+    }
+
+    /* Input Styling */
+    input[type="file"] {
+      font-size: 0.9rem;
+      padding: 0.5rem;
+      border: 2px dashed #cbd5e1;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.6);
+      width: auto;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    input[type="file"]:hover {
+      border-color: var(--primary);
+      background: #fff;
+    }
+
+    input[type="file"]::file-selector-button {
+      margin-right: 1rem;
+      border: none;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      padding: 0.6rem 1.5rem;
+      border-radius: 999px;
+      color: white;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.4);
+      transition: transform 0.2s;
+    }
+
+    input[type="file"]::file-selector-button:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Cards */
+    .grid {
+      display: grid;
+      gap: 2rem;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Base Card */
+    .card {
+      background: #ffffff;
+      border: none;
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: var(--card-shadow);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      animation: fadeInUp 0.6s ease-out backwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Colorful Card Variants via nth-child logic or explicit classes later set in HTML */
+
+    /* Subject Tags */
+    .subject-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+      justify-content: center;
+    }
+
+    .tag {
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 0.25rem 0.75rem;
+      border-radius: 99px;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .tag.strong {
+      background: var(--success);
+    }
+
+    .tag.average {
+      background: var(--warning);
+    }
+
+    .tag.weak {
+      background: var(--danger);
+    }
+
+    .card:hover {
+      box-shadow: var(--card-hover);
+      transform: translateY(-5px);
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1.5rem;
+      color: #334155;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 320px;
+    }
+
+    /* Greeting */
+    .greeting {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      color: var(--text);
+      animation: fadeInUp 0.6s ease-out backwards;
+    }
+
+    .greeting strong {
+      color: transparent;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Academic Health */
+    .health-section {
+      margin-bottom: 2.5rem;
+      animation: fadeInUp 0.6s ease-out 0.2s backwards;
+    }
+
+    .health-row {
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .health-meter-wrap {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      /* Gradient Conic */
+      background: conic-gradient(var(--health-color) calc(var(--pct) * 1%), #cbd5e1 0);
+      padding: 8px;
+      flex-shrink: 0;
+      box-shadow: var(--card-shadow);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+
+    .health-meter-wrap:hover {
+      transform: scale(1.05);
+    }
+
+    .health-meter-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 2.5rem;
+      color: var(--health-color);
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Mentor Box for Markdown content */
+    .mentor-box {
+      line-height: 1.7;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+      white-space: normal;
+      /* Markdown handles lines */
+    }
+
+    .mentor-box p {
+      margin-bottom: 0.75rem;
+    }
+
+    .mentor-box ul,
+    .mentor-box ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .mentor-box li {
+      margin-bottom: 0.25rem;
+    }
+
+    .mentor-box strong {
+      color: var(--primary-dark);
+      font-weight: 700;
+    }
+
+    .health-label .title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .health-label span {
+      font-size: 1rem;
+      color: var(--muted);
+    }
+
+    /* Key Insight: Modern "Toast" style */
+    .key-insight {
+      background: linear-gradient(to right, #eff6ff, #f8fafc);
+      border: 1px solid #dbeafe;
+      border-left: 5px solid var(--primary);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2.5rem;
+      font-size: 1.05rem;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      animation: fadeInUp 0.6s ease-out 0.3s backwards;
+    }
+
+    .key-insight strong {
+      color: var(--primary);
+      margin-right: 0.5rem;
+      font-weight: 700;
+    }
+
+    /* One-line key insight */
+    .key-insight {
+      background: #eff6ff;
+      /* Light Blue tint */
+      border: 1px solid #dbeafe;
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 2rem;
+      font-size: 1rem;
+      color: #1e3a8a;
+      /* Dark Blue text */
+      display: flex;
+      align-items: center;
+    }
+
+    .key-insight strong {
+      color: var(--accent);
+      margin-right: 0.5rem;
+    }
+
+    /* Summary Stats */
+    /* Stats: Colorful Pills */
+    .summary-stats {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+      animation: fadeInUp 0.6s ease-out 0.4s backwards;
+    }
+
+    .stat {
+      background: #ffffff;
+      padding: 1rem 1.5rem;
+      border-radius: 20px;
+      font-size: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      border: 1px solid #f1f5f9;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: transform 0.2s;
+    }
+
+    .stat:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat strong {
+      color: var(--text);
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+
+    /* Table */
+    .students-table {
+      border-spacing: 0 0.75rem;
+      width: 100%;
+      border-collapse: separate;
+    }
+
+    .students-table th {
+      border: none;
+      padding: 1rem 1.5rem;
+      letter-spacing: 0.05em;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .students-table td {
+      border: none;
+      padding: 1.25rem 1.5rem;
+      background: #ffffff;
+      transition: background 0.2s;
+    }
+
+    .students-table td:first-child {
+      border-top-left-radius: 16px;
+      border-bottom-left-radius: 16px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .students-table td:last-child {
+      border-top-right-radius: 16px;
+      border-bottom-right-radius: 16px;
+    }
+
+    .students-table tbody tr {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+      transition: transform 0.2s;
+    }
+
+    .students-table tbody tr:hover {
+      transform: scale(1.01);
+    }
+
+    .students-table tbody tr:hover td {
+      background: #f0f9ff;
+      color: #0284c7;
+    }
+
+    .students-table tbody tr.selected td {
+      background: #eff6ff;
+      color: var(--primary-dark);
+      box-shadow: inset 4px 0 0 var(--primary);
+    }
+
+    /* Badges */
+    .risk-badge {
+      padding: 0.4rem 0.8rem;
+      font-weight: 700;
+      border-radius: 99px;
+    }
+
+    .health-pill {
+      padding: 0.4rem 0.8rem;
+      font-weight: 800;
+      border-radius: 99px;
+    }
+
+    /* Chips: Vibrant and Distinct */
+    .quick-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .chip {
+      background: #ffffff;
+      border: 2px solid transparent;
+      border-radius: 99px;
+      padding: 0.6rem 1.25rem;
+      font-size: 0.9rem;
+      color: #475569;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s;
+      background-clip: padding-box;
+      position: relative;
+    }
+
+    .chip::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 99px;
+      padding: 2px;
+      background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .chip:nth-child(1):hover {
+      background: #eff6ff;
+      color: #2563eb;
+      transform: translateY(-2px);
+    }
+
+    .chip:nth-child(2):hover {
+      background: #fdf2f8;
+      color: #db2777;
+      transform: translateY(-2px);
+    }
+
+    .chip:nth-child(3):hover {
+      background: #ecfdf5;
+      color: #059669;
+      transform: translateY(-2px);
+    }
+
+    .chip:nth-child(4):hover {
+      background: #fffbeb;
+      color: #d97706;
+      transform: translateY(-2px);
+    }
+
+    /* Mentor Box - EXPANDED & COLORFUL */
+    .mentor-section {
+      grid-column: 1 / -1;
+      margin-top: 2rem;
+    }
+
+    .mentor-box {
+      background: #ffffff;
+      border: none;
+      border-radius: 24px;
+      padding: 2.5rem;
+      margin-top: 0;
+      position: relative;
+      font-size: 1.1rem;
+      color: #334155;
+      line-height: 1.8;
+      min-height: 300px;
+      /* Big increase */
+      box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.1);
+      background-image: radial-gradient(circle at 100% 0%, rgba(99, 102, 241, 0.05) 0%, transparent 20%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .mentor-box.loading {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .mentor-box.loading::after {
+      content: '...';
+      animation: blink 1s infinite;
+    }
+
+    .chat-row {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .chat-row input {
+      flex: 1;
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 1.25rem 1.5rem;
+      font-size: 1.1rem;
+      transition: all 0.2s;
+    }
+
+    .chat-row input:focus {
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    .chat-row button {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 0 2.5rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4);
+      transition: all 0.2s;
+    }
+
+    .chat-row button:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 15px 30px -5px rgba(79, 70, 229, 0.5);
+    }
+
+    .chat-row button:active {
+      transform: translateY(0);
+    }
+
+    @media (max-width: 768px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .health-row {
+        justify-content: center;
+      }
+
+      .container {
+        padding: 1rem;
+      }
+
+      .card {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <div class="header-content">
+        <div>
+          <h1>Student Performance Analysis</h1>
+          <p class="sub">Analytics, insights & your personal study coach</p>
+        </div>
+        <div class="upload-wrap">
+          <label><input type="file" id="csvFile" accept=".csv" /></label>
+        </div>
+      </div>
+    </header>
+
+    <!-- 1. Personalized greeting -->
+    <p class="greeting" id="greeting">Welcome! Here’s your performance at a glance.</p>
+
+    <!-- 2. Academic Health Score -->
+    <section class="health-section" id="healthSection">
+      <div class="health-row">
+        <div class="health-meter-wrap" id="healthMeterWrap" style="--pct: 0; --health-color: var(--muted);">
+          <div class="health-meter-inner" id="healthMeterValue">–</div>
+        </div>
+        <div class="health-label">
+          <span class="title">Academic Health Score</span>
+          <span id="healthSubtext">Class average</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. One-line key insight -->
+    <div class="key-insight" id="keyInsight"></div>
+
+    <!-- 4. Summary + Charts & tables -->
+    <div class="summary-stats" id="summaryStats"></div>
+
+    <div class="grid grid-2">
+      <!-- 1. Marks Card (Lavender gradient) -->
+      <div class="card" style="background: linear-gradient(135deg, #fff 0%, #f5f3ff 100%);">
+        <h2><span style="font-size:1.5rem;">📊</span> Average marks by student</h2>
+        <div class="chart-wrap"><canvas id="chartMarks"></canvas></div>
+        <div id="subjectTags" class="subject-tags"></div>
+      </div>
+
+      <!-- 2. Risk Card (Warm gradient) -->
+      <div class="card" style="background: linear-gradient(135deg, #fff 0%, #fff7ed 100%);">
+        <h2><span style="font-size:1.5rem;">🎯</span> Students on track vs need support</h2>
+        <div class="chart-wrap"><canvas id="chartRisk"></canvas></div>
+      </div>
+
+      <!-- 3. Table Card (Mint gradient) -->
+      <div class="card" style="grid-column: 1 / -1; background: linear-gradient(135deg, #fff 0%, #f0fdfa 100%);">
+        <h2><span style="font-size:1.5rem;">👥</span> Student insights</h2>
+        <p class="sub" style="margin-bottom:1rem;">Click a row to focus your Study Coach on that student.</p>
+        <div style="overflow-x: auto;">
+          <table class="students-table" id="studentsTable">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Avg marks</th>
+                <th>Attendance</th>
+                <th>Academic health</th>
+                <th>Focus areas</th>
+              </tr>
+            </thead>
+            <tbody id="studentsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 5. Study Coach - Expanded -->
+      <div class="card mentor-section"
+        style="background: #fff; border: 1px solid #e0e7ff; box-shadow: 0 20px 50px -10px rgba(99, 102, 241, 0.15);">
+        <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem; justify-content: center;">
+          <span
+            style="background: linear-gradient(to right, #4f46e5, #9333ea); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Your
+            Personal Study Coach</span>
+          <span>🤖</span>
+        </h2>
+        <p style="text-align: center; color: var(--muted); margin-bottom: 2rem;">Ask anything about student performance,
+          or pick a quick action below.</p>
+
+        <div class="quick-chips" style="justify-content: center;">
+          <button type="button" class="chip" data-q="How can I improve?">📌 How can I improve?</button>
+          <button type="button" class="chip" data-q="Make a study plan for me">📚 Make a study plan</button>
+          <button type="button" class="chip" data-q="Focus on my weak subjects">🎯 Focus on weak subjects</button>
+          <button type="button" class="chip" data-q="How can I improve my attendance?">📈 Improve attendance</button>
+        </div>
+
+        <div class="mentor-box" id="mentorBox">Click &quot;Load overview&quot; or pick a suggestion above to get started
+          with personalized AI insights.</div>
+
+        <div class="chat-row">
+          <input type="text" id="chatInput" placeholder="Messages Study Coach..." />
+          <button type="button" id="btnOverview" style="display:none">Load</button> <!-- Hidden, integrated flow -->
+          <button type="button" id="btnChat">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = '';
+    let chartMarks = null, chartRisk = null;
+    let selectedStudentId = null;
+    let currentFilename = null;  // Track currently loaded file
+
+    function healthColor(pct) {
+      if (pct >= 75) return 'var(--success)';
+      if (pct >= 55) return 'var(--warning)';
+      return 'var(--danger)';
+    }
+
+    function healthClass(pct) {
+      if (pct >= 75) return 'green';
+      if (pct >= 55) return 'yellow';
+      return 'red';
+    }
+
+    async function fetchInsights() {
+      const fileEl = document.getElementById('csvFile');
+      if (fileEl.files.length) {
+        currentFilename = fileEl.files[0].name; // Store filename
+        const form = new FormData();
+        form.append('file', fileEl.files[0]);
+        const r = await fetch(API + '/api/upload', { method: 'POST', body: form });
+        if (!r.ok) {
+          const text = await r.text();
+          let msg = text;
+          try { const j = JSON.parse(text); if (j.detail) msg = j.detail; } catch (_) { }
+          throw new Error(msg);
+        }
+        return r.json();
+      }
+      currentFilename = null; // Reset if loading default
+      const r = await fetch(API + '/api/insights');
+      if (!r.ok) {
+        const text = await r.text();
+        let msg = text;
+        try { const j = JSON.parse(text); if (j.detail) msg = j.detail; } catch (_) { }
+        throw new Error(msg);
+      }
+      return r.json();
+    }
+
+    function renderGreeting(insights) {
+      const el = document.getElementById('greeting');
+      const students = insights.students || [];
+      if (students.length === 1 && students[0].name) {
+        el.innerHTML = 'Hi <strong>' + students[0].name.split(' ')[0] + '</strong>! Here\'s your performance at a glance.';
+      } else {
+        el.innerHTML = 'Welcome! Here\'s your performance at a glance.';
+      }
+    }
+
+    function updateHealthMeter(insights, forStudentId) {
+      const wrap = document.getElementById('healthMeterWrap');
+      const valueEl = document.getElementById('healthMeterValue');
+      const sub = document.getElementById('healthSubtext');
+      let pct = null;
+      let subtext = 'Upload or load data';
+      if (insights && insights.students && insights.students.length) {
+        if (forStudentId) {
+          const s = insights.students.find(x => String(x.student_id) === String(forStudentId));
+          if (s && s.academic_health != null) {
+            pct = s.academic_health;
+            subtext = (s.name || s.student_id) + ' (60% marks + 40% attendance)';
+          }
+        }
+        if (pct == null && insights.summary && insights.summary.class_academic_health != null) {
+          pct = insights.summary.class_academic_health;
+          subtext = 'Class average (60% marks + 40% attendance)';
+        }
+      }
+      if (pct == null) {
+        wrap.style.setProperty('--pct', 0);
+        wrap.style.setProperty('--health-color', 'var(--muted)');
+        valueEl.textContent = '–';
+        sub.textContent = subtext;
+        return;
+      }
+      const clamped = Math.min(100, Math.max(0, pct));
+      wrap.style.setProperty('--pct', clamped);
+      wrap.style.setProperty('--health-color', healthColor(clamped));
+      valueEl.textContent = Math.round(clamped) + '%';
+      sub.textContent = subtext;
+    }
+
+    function renderHealth(insights) {
+      updateHealthMeter(insights, selectedStudentId);
+    }
+
+    function renderKeyInsight(insights) {
+      const el = document.getElementById('keyInsight');
+      const text = insights.summary && insights.summary.attendance_marks_correlation
+        ? insights.summary.attendance_marks_correlation
+        : '';
+      el.innerHTML = text ? '<strong>Key insight:</strong> ' + text : '';
+    }
+
+    function renderSummary(summary) {
+      const el = document.getElementById('summaryStats');
+      if (!summary) { el.innerHTML = ''; return; }
+      el.innerHTML = `
+        <span class="stat">Total students: <strong>${summary.total_students}</strong></span>
+        <span class="stat">Need support: <strong>${summary.students_at_risk_count}</strong></span>
+      `;
+    }
+
+    function renderCharts(insights, studentId = null) {
+      const students = insights.students || [];
+
+      let chart1Label, chart1Labels, chart1Data;
+
+      // Determine what to show in the first chart
+      if (studentId) {
+        // Show Subject-wise marks for the selected student
+        const s = students.find(x => String(x.student_id) === String(studentId));
+        if (s && s.subject_marks && s.subject_marks.length > 0) {
+          chart1Label = `Marks by Subject (${s.name || s.student_id})`;
+          chart1Labels = s.subject_marks.map(m => m.subject);
+          chart1Data = s.subject_marks.map(m => m.marks);
+        } else {
+          // Fallback if no subject data
+          chart1Label = 'Avg marks by student';
+          chart1Labels = students.map(s => s.name || s.student_id);
+          chart1Data = students.map(s => s.avg_marks ?? 0);
+        }
+      } else {
+        // Show Class Overview (Limit to first 15 to avoid overfitting)
+        const limit = 15;
+        const subset = students.slice(0, limit);
+        chart1Label = 'Avg marks by student (Top ' + subset.length + ')';
+        chart1Labels = subset.map(s => s.name || s.student_id);
+        chart1Data = subset.map(s => s.avg_marks ?? 0);
+      }
+
+      function renderAICharts(container) {
+        // 1. Scan code blocks (most likely)
+        const codeBlocks = container.querySelectorAll('code');
+        codeBlocks.forEach((code) => {
+          try {
+            const raw = code.textContent.trim();
+            if (!raw.startsWith('{') || !raw.includes('"data":')) return;
+
+            // Parse JSON
+            const firstBrace = raw.indexOf('{');
+            const lastBrace = raw.lastIndexOf('}');
+            if (firstBrace === -1 || lastBrace === -1) return;
+            const json = JSON.parse(raw.substring(firstBrace, lastBrace + 1));
+
+            if (!json.type || !json.data) return;
+
+            // Create Wrapper
+            const wrapper = document.createElement('div');
+            wrapper.className = 'ai-chart-wrapper';
+            wrapper.style.height = '250px';
+            wrapper.style.maxWidth = '100%';
+            const canvas = document.createElement('canvas');
+            wrapper.appendChild(canvas);
+
+            // Replace the <pre> if possible, else the <code>
+            if (code.parentElement && code.parentElement.tagName === 'PRE') {
+              code.parentElement.replaceWith(wrapper);
+            } else {
+              code.replaceWith(wrapper);
+            }
+
+            // Render
+            new Chart(canvas, {
+              type: json.type,
+              data: {
+                labels: json.labels || [],
+                datasets: [{
+                  label: json.title || 'Data',
+                  data: json.data || [],
+                  backgroundColor: (json.type === 'pie' || json.type === 'doughnut')
+                    ? ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
+                    : 'rgba(99, 102, 241, 0.8)',
+                  borderColor: '#4f46e5',
+                  borderWidth: 1
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: { display: ['pie', 'doughnut'].includes(json.type) },
+                  title: { display: !!json.title, text: json.title }
+                }
+              }
+            });
+
+          } catch (e) { /* ignore */ }
+        });
+
+        // 2. Scan paragraphs for raw JSON leak (fallback)
+        container.querySelectorAll('p').forEach(p => {
+          const txt = p.textContent.trim();
+          if (txt.startsWith('{') && txt.includes('"type":') && txt.endsWith('}')) {
+            // It's likely a raw JSON dump that marked.js didn't catch in a code block
+            const code = document.createElement('code');
+            code.textContent = txt;
+            p.replaceWith(code);
+            // Re-run checking on this new code block
+            renderAICharts(container);
+          }
+        });
+      }
+      // Update Chart 1 (Marks)
+      const ctxMarks = document.getElementById('chartMarks').getContext('2d');
+      if (chartMarks) chartMarks.destroy();
+
+      // Update the card title for context
+      const cardTitle = document.querySelector('#chartMarks').closest('.card').querySelector('h2');
+      if (cardTitle) cardTitle.textContent = chart1Label;
+
+      chartMarks = new Chart(ctxMarks, {
+        type: 'bar',
+        data: {
+          labels: chart1Labels,
+          datasets: [{
+            label: 'Marks',
+            data: chart1Data,
+            backgroundColor: 'rgba(99, 102, 241, 0.85)',
+            hoverBackgroundColor: '#4f46e5',
+            borderColor: 'transparent',
+            borderRadius: 8,
+            borderSkipped: false,
+            barThickness: 'flex',
+            maxBarThickness: 40
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 1000, easing: 'easeOutQuart' },
+          scales: {
+            y: {
+              beginAtZero: true, max: 100,
+              grid: { color: '#f1f5f9', borderDash: [5, 5], drawBorder: false },
+              ticks: { color: '#94a3b8', font: { family: 'DM Sans', size: 11, weight: '500' }, padding: 10 }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#64748b', font: { family: 'DM Sans', size: 11, weight: '500' } }
+            }
+          },
+          plugins: {
+            legend: { display: false }, tooltip: {
+              backgroundColor: '#1e293b',
+              padding: 12,
+              cornerRadius: 12,
+              titleFont: { family: 'DM Sans', size: 13 },
+              bodyFont: { family: 'DM Sans', size: 13 },
+              displayColors: false
+            }
+          }
+        }
+      });
+
+      // Populate Tags
+      const tagDiv = document.getElementById('subjectTags');
+      tagDiv.innerHTML = '';
+      if (studentId) {
+        const s = students.find(x => String(x.student_id) === String(studentId));
+        if (s && s.subject_marks) {
+          s.subject_marks.forEach(m => {
+            let type = 'average';
+            if (m.marks >= 80) type = 'strong';
+            else if (m.marks < 60) type = 'weak';
+
+            const sp = document.createElement('span');
+            sp.className = 'tag ' + type;
+            sp.textContent = m.subject + ': ' + m.marks;
+            tagDiv.appendChild(sp);
+          });
+        }
+      }
+
+      // Chart 2 (Risk/Status)
+      const atRisk = students.filter(s => (s.risk_flags || []).length > 0).length;
+      const safe = students.length - atRisk;
+
+      if (chartRisk) chartRisk.destroy();
+      chartRisk = new Chart(document.getElementById('chartRisk'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Need support', 'On track'],
+          datasets: [{
+            data: [atRisk, safe],
+            backgroundColor: ['#f59e0b', '#10b981'],
+            borderWidth: 0,
+            hoverOffset: 10
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { animateScale: true, animateRotate: true, duration: 1200, easing: 'easeOutQuart' },
+          plugins: {
+            legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 20, color: '#64748b', font: { family: 'DM Sans', weight: '500' } } }
+          },
+          cutout: '75%'
+        }
+      });
+    }
+
+    function renderTable(insights) {
+      const tbody = document.getElementById('studentsBody');
+      const students = insights.students || [];
+      selectedStudentId = null;
+      tbody.innerHTML = students.map(s => {
+        const health = s.academic_health != null ? s.academic_health : (0.6 * (s.avg_marks || 0) + 0.4 * (s.attendance_avg || 0));
+        const hClass = healthClass(health);
+        const flags = (s.risk_flags || []).map(f => `<span class="risk-badge warning">${f}</span>`).join(' ');
+        return `
+          <tr data-student-id="${s.student_id}">
+            <td>${s.name || s.student_id}</td>
+            <td>${s.avg_marks ?? '-'}</td>
+            <td>${s.attendance_avg != null ? s.attendance_avg + '%' : '-'}</td>
+            <td><span class="health-pill ${hClass}">${Math.round(health)}%</span></td>
+            <td>${flags || '–'}</td>
+          </tr>
+        `;
+      }).join('');
+      tbody.querySelectorAll('tr').forEach(tr => {
+        tr.addEventListener('click', () => {
+          tbody.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
+          tr.classList.add('selected');
+          selectedStudentId = tr.getAttribute('data-student-id');
+          if (window.__lastInsights) {
+            updateHealthMeter(window.__lastInsights, selectedStudentId);
+            renderCharts(window.__lastInsights, selectedStudentId); // Update charts for selected student
+          }
+        });
+      });
+    }
+
+    async function loadData() {
+      try {
+        const insights = await fetchInsights();
+        renderGreeting(insights);
+        renderHealth(insights);
+        renderKeyInsight(insights);
+        renderSummary(insights.summary);
+        renderCharts(insights);
+        renderTable(insights);
+        window.__lastInsights = insights;
+      } catch (e) {
+        document.getElementById('summaryStats').innerHTML = '<span class="stat" style="color:var(--danger)">Error: ' + e.message + '</span>';
+      }
+    }
+
+    function setMentorLoading(loading) {
+      const box = document.getElementById('mentorBox');
+      if (loading) box.classList.add('loading');
+      else box.classList.remove('loading');
+    }
+
+    async function mentorOverview() {
+      const box = document.getElementById('mentorBox');
+      box.innerHTML = '<em>Thinking...</em>';
+      setMentorLoading(true);
+      try {
+        const r = await fetch(API + '/api/mentor');
+        const j = await r.json();
+        box.innerHTML = marked.parse(j.response || 'No response');
+      } catch (e) {
+        box.innerHTML = '<span style="color:var(--danger)">Error: ' + e.message + '</span>';
+      }
+      setMentorLoading(false);
+    }
+
+    async function mentorChat() {
+      const input = document.getElementById('chatInput');
+      const q = input.value.trim();
+      if (!q) return;
+      const box = document.getElementById('mentorBox');
+      box.textContent = 'Thinking...';
+      setMentorLoading(true);
+      const btn = document.getElementById('btnChat');
+      btn.disabled = true;
+      try {
+        const r = await fetch(API + '/api/mentor/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            question: q,
+            student_id: selectedStudentId || undefined,
+            filename: currentFilename || undefined // Send filename context
+          })
+        });
+        const j = await r.json();
+        box.innerHTML = marked.parse(j.response || 'No response');
+      } catch (e) {
+        box.innerHTML = '<span style="color:var(--danger)">Error: ' + e.message + '</span>';
+      }
+      btn.disabled = false;
+      setMentorLoading(false);
+    }
+
+    document.getElementById('csvFile').addEventListener('change', loadData);
+    document.getElementById('btnOverview').addEventListener('click', mentorOverview);
+    document.getElementById('btnChat').addEventListener('click', mentorChat);
+    document.getElementById('chatInput').addEventListener('keypress', e => { if (e.key === 'Enter') mentorChat(); });
+    document.querySelectorAll('.chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.getElementById('chatInput').value = btn.getAttribute('data-q');
+        document.getElementById('chatInput').focus();
+      });
+    });
+    loadData();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,25 @@
+# Environment and secrets
+.env
+.env.local
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Data (optional: keep sample, ignore uploads)
+data/uploads/
+
+# OS
+.DS_Store
+Thumbs.db
