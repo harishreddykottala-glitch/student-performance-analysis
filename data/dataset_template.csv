@@ -1,0 +1,7 @@
+student_id,name,subject,marks,attendance_pct,grade,semester
+S001,Student One,Mathematics,72,88,B+,1
+S001,Student One,Physics,65,82,B,1
+S001,Student One,Chemistry,78,90,A,1
+S002,Student Two,Mathematics,88,92,A,1
+S002,Student Two,Physics,85,88,A,1
+S002,Student Two,Chemistry,82,90,A,1

@@ -1,0 +1,21 @@
+student_id,name,subject,marks,attendance_pct,grade,semester
+S001,Rahul Sharma,Mathematics,72,88,B+,1
+S001,Rahul Sharma,Physics,65,82,B,1
+S001,Rahul Sharma,Chemistry,78,90,A,1
+S001,Rahul Sharma,English,81,95,A,1
+S002,Priya Patel,Mathematics,88,92,A,1
+S002,Priya Patel,Physics,85,88,A,1
+S002,Priya Patel,Chemistry,82,90,A,1
+S002,Priya Patel,English,90,98,A+,1
+S003,Amit Kumar,Mathematics,45,65,D,1
+S003,Amit Kumar,Physics,52,70,C,1
+S003,Amit Kumar,Chemistry,48,68,D,1
+S003,Amit Kumar,English,55,72,C,1
+S004,Neha Singh,Mathematics,76,85,B+,1
+S004,Neha Singh,Physics,71,80,B,1
+S004,Neha Singh,Chemistry,69,78,B,1
+S004,Neha Singh,English,84,92,A,1
+S005,Vikram Reddy,Mathematics,92,96,A+,1
+S005,Vikram Reddy,Physics,89,94,A,1
+S005,Vikram Reddy,Chemistry,91,95,A+,1
+S005,Vikram Reddy,English,87,93,A,1
